@@ -1,58 +1,41 @@
-# WeatherAPI App
+# Weather API App
 
-This is a simple web application that allows users to get the current weather information for a specific location using the WeatherAPI.
-
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Features](#features)
-- [Setup](#setup)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Introduction
-
-This web application utilizes the WeatherAPI to fetch current weather data for a given location. Users can input the desired location, and the application will display information such as temperature, condition, wind speed, humidity, and cloud cover.
+This is a simple web application that allows users to get weather information for a specific location using an external weather API.
 
 ## Features
 
-- Fetches current weather data from the WeatherAPI
-- Allows users to input a location to get weather information
-- Displays temperature, condition, wind speed, humidity, and cloud cover
-- Simple and intuitive user interface
+- Users can enter a city name to get the current weather information.
+- The app displays the location, weather condition, temperature, humidity, and wind speed.
+- Error handling for invalid input or API errors.
 
-## Setup
+## Technologies Used
 
-1. **Clone the repository:**
+- HTML
+- CSS
+- JavaScript
+
+## Getting Started
+
+To run this app locally, follow these steps:
+
+1. Clone this repository to your local machine:
+
    ```
-   git clone https://github.com/Ismat-Samadov/weatherapiAPP.git
+   git clone https://github.com/Ismat-Samadov/weatherApiApp.git
    ```
 
-2. **Navigate to the project directory:**
-   ```
-   cd weatherapiAPP
-   ```
+2. Open the project directory in your code editor.
 
-3. **Open `index.html` in your web browser:**
-   ```
-   double click on index.html
-   ```
+3. Open the `index.html` file in a web browser to view the app.
 
 ## Usage
 
-1. Enter the desired location in the input field.
+1. Enter the name of a city in the input field.
 2. Click the "Get Weather" button.
-3. The current weather information for the specified location will be displayed on the webpage.
+3. The app will fetch the current weather data for the specified location and display it on the page.
 
-## Contributing
+## Credits
 
-Contributions are welcome! Here's how you can contribute to this project:
+This app was created by [Your Name].
 
-1. Fork the repository.
-2. Create your feature branch: `git checkout -b feature/my-feature`.
-3. Commit your changes: `git commit -am 'Add some feature'`.
-4. Push to the branch: `git push origin feature/my-feature`.
-5. Submit a pull request.
-
-Please make sure to update tests as appropriate.
+The weather data is retrieved from the [WeatherAPI](https://www.weatherapi.com/) service.
