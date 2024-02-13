@@ -1,32 +1,33 @@
-document.getElementById('location-form').addEventListener('submit', async function(event) {
-  event.preventDefault();
-  const location = document.getElementById('location-input').value;
-  const weatherData = await getWeatherData(location);
-  displayWeatherInfo(weatherData);
-});
+function getWeather() {
+    var location = document.getElementById("location").value;
+    var apiKey = "4516173a2e8d4123969121246241302";
+    var url = "http://api.weatherapi.com/v1/current.json?key=" + apiKey + "&q=" + location;
 
-async function getWeatherData(location) {
-  const apiKey = '4516173a2e8d4123969121246241302';
-  const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`;
-  try {
-    const response = await fetch(apiUrl, { mode: 'cors' });
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching weather data:', error);
-    return null;
-  }
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            displayWeather(data);
+        })
+        .catch(error => {
+            console.log("Error:", error);
+        });
 }
 
+function displayWeather(data) {
+    var weatherData = document.getElementById("weather-data");
+    if (data.error) {
+        weatherData.textContent = "Error: " + data.error.message;
+    } else {
+        var location = data.location.name + ", " + data.location.country;
+        var condition = data.current.condition.text;
+        var temperature = data.current.temp_c + "°C";
+        var humidity = "Humidity: " + data.current.humidity + "%";
+        var windSpeed = "Wind Speed: " + data.current.wind_kph + " km/h";
 
-function displayWeatherInfo(weatherData) {
-  const weatherInfoElement = document.getElementById('weather-info');
-  weatherInfoElement.innerHTML = `
-    <h2>${weatherData.location.name}</h2>
-    <p>Temperature: ${weatherData.current.temp_c}°C</p>
-    <p>Condition: ${weatherData.current.condition.text}</p>
-    <p>Wind Speed: ${weatherData.current.wind_kph} km/h</p>
-    <p>Humidity: ${weatherData.current.humidity}%</p>
-    <p>Cloud Cover: ${weatherData.current.cloud}%</p>
-  `;
+        weatherData.innerHTML = "<strong>Location:</strong> " + location + "<br>" +
+                                "<strong>Condition:</strong> " + condition + "<br>" +
+                                "<strong>Temperature:</strong> " + temperature + "<br>" +
+                                humidity + "<br>" +
+                                windSpeed;
+    }
 }
