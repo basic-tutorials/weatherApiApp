@@ -1,7 +1,7 @@
 function getWeather() {
     var location = document.getElementById("location").value;
     var apiKey = "4516173a2e8d4123969121246241302";
-    var url = "http://api.weatherapi.com/v1/current.json?key=" + apiKey + "&q=" + location;
+    var url = "https://api.weatherapi.com/v1/current.json?key=" + apiKey + "&q=" + location;
 
     fetch(url)
         .then(response => response.json())
