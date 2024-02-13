@@ -6,12 +6,18 @@ document.getElementById('location-form').addEventListener('submit', async functi
 });
 
 async function getWeatherData(location) {
-  const apiKey = '4516173a2e8d4123969121246241302';
+  const apiKey = 'YOUR_WEATHERAPI_KEY';
   const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`;
-  const response = await fetch(apiUrl);
-  const data = await response.json();
-  return data;
+  try {
+    const response = await fetch(apiUrl, { mode: 'cors' });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching weather data:', error);
+    return null;
+  }
 }
+
 
 function displayWeatherInfo(weatherData) {
   const weatherInfoElement = document.getElementById('weather-info');
