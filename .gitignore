@@ -27,10 +27,6 @@ env/
 htmlcov/
 
 # Output files (except .gitkeep)
-output/*.txt
-output/*.csv
-output/*.json
-output/*.pdf
 !output/.gitkeep
 
 # API keys
