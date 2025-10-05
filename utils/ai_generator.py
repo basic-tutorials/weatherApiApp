@@ -10,7 +10,7 @@ import os
 class AIGenerator:
     """Generate AI-enhanced content for research proposals."""
 
-    def __init__(self, provider: str = 'anthropic', api_key: str = ''):
+    def __init__(self, provider: str = 'openai', api_key: str = ''):
         """Initialize AI generator with provider."""
         self.provider = provider
         self.api_key = api_key
@@ -19,12 +19,292 @@ class AIGenerator:
         if api_key:
             self._init_client()
 
+    def enhance_user_input(self, inputs: dict) -> dict:
+        """
+        Enhance and clean user input using AI before processing.
+        This improves quality by fixing capitalization, grammar, and expanding brief inputs.
+        """
+        enhanced = inputs.copy()
+
+        if not self.client:
+            print("⚠️  No API key - using basic text formatting")
+            # Even without AI, do basic formatting improvements
+            enhanced['research_title'] = self._basic_title_format(inputs['research_title'])
+            enhanced['research_question'] = self._basic_question_format(inputs['research_question'])
+            enhanced['researcher_name'] = self._basic_name_format(inputs['researcher_name'])
+            return enhanced
+
+        print("✨ Enhancing user input with AI...")
+
+        try:
+            # Enhance research title
+            enhanced['research_title'] = self._enhance_title(inputs['research_title'])
+
+            # Enhance research question
+            enhanced['research_question'] = self._enhance_question(inputs['research_question'])
+
+            # Enhance methodology
+            enhanced['methodology'] = self._enhance_methodology(inputs['methodology'], inputs['field_of_study'])
+
+            # Enhance expected outcomes
+            enhanced['expected_outcomes'] = self._enhance_outcomes(inputs['expected_outcomes'])
+
+            # Fix researcher name
+            enhanced['researcher_name'] = self._basic_name_format(inputs['researcher_name'])
+
+            print("✅ Input enhancement complete")
+            return enhanced
+
+        except Exception as e:
+            print(f"⚠️  AI enhancement failed: {e}. Using basic formatting.")
+            # Fallback to basic formatting
+            enhanced['research_title'] = self._basic_title_format(inputs['research_title'])
+            enhanced['research_question'] = self._basic_question_format(inputs['research_question'])
+            enhanced['researcher_name'] = self._basic_name_format(inputs['researcher_name'])
+            return enhanced
+
+    def _basic_title_format(self, title: str) -> str:
+        """Basic title formatting without AI."""
+        if not title or len(title.strip()) < 2:
+            return title
+
+        # Convert to Title Case
+        title = title.strip()
+
+        # Simple title case with proper handling of common words
+        words = title.split()
+        formatted_words = []
+
+        # Words that should stay lowercase (unless first word)
+        lowercase_words = {'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'yet'}
+
+        for i, word in enumerate(words):
+            if i == 0 or word.lower() not in lowercase_words:
+                # Capitalize first letter, keep rest as is (for acronyms like ML, AI)
+                if word.isupper() and len(word) <= 3:  # Likely an acronym
+                    formatted_words.append(word.upper())
+                else:
+                    formatted_words.append(word.capitalize())
+            else:
+                formatted_words.append(word.lower())
+
+        return ' '.join(formatted_words)
+
+    def _basic_question_format(self, question: str) -> str:
+        """Basic question formatting without AI."""
+        if not question or len(question.strip()) < 2:
+            return question
+
+        question = question.strip()
+
+        # Capitalize first letter
+        if question[0].islower():
+            question = question[0].upper() + question[1:]
+
+        # Ensure it ends with a question mark if it looks like a question
+        question_words = ['how', 'what', 'why', 'when', 'where', 'who', 'can', 'does', 'is', 'will']
+        if any(question.lower().startswith(word) for word in question_words):
+            if not question.endswith('?'):
+                question = question.rstrip('.') + '?'
+
+        return question
+
+    def _basic_name_format(self, name: str) -> str:
+        """Basic name formatting without AI."""
+        if not name or len(name.strip()) < 2:
+            return name
+
+        # Title case for names
+        name = name.strip()
+
+        # Handle special cases like "dr.", "prof.", etc.
+        prefixes = {'dr.': 'Dr.', 'dr': 'Dr.', 'prof.': 'Prof.', 'prof': 'Prof.', 'mr.': 'Mr.', 'ms.': 'Ms.', 'mrs.': 'Mrs.'}
+
+        words = name.split()
+        formatted_words = []
+
+        for word in words:
+            word_lower = word.lower().rstrip('.')
+            if word_lower in prefixes:
+                formatted_words.append(prefixes[word_lower])
+            else:
+                formatted_words.append(word.capitalize())
+
+        return ' '.join(formatted_words)
+
+
+    def _enhance_title(self, title: str) -> str:
+        """Clean and enhance research title."""
+        if not title or len(title.strip()) < 3:
+            return title
+
+        prompt = f"""Improve this research title to be professional and academic:
+
+Input: "{title}"
+
+Requirements:
+- Proper capitalization (Title Case)
+- Clear and descriptive
+- Academic tone
+- Fix any grammar/spelling errors
+- Keep it concise (under 15 words)
+- DO NOT add quotes or extra formatting
+
+Return ONLY the improved title, nothing else."""
+
+        try:
+            if self.provider == 'openai':
+                response = self.client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=100,
+                    temperature=0.3
+                )
+                result = response.choices[0].message.content.strip().strip('"').strip("'")
+                return result if result else title
+            elif self.provider == 'anthropic':
+                response = self.client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=100,
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                result = response.content[0].text.strip().strip('"').strip("'")
+                return result if result else title
+        except Exception as e:
+            print(f"   Title enhancement failed: {e}")
+            # Fallback to basic formatting
+            return self._basic_title_format(title)
+
+    def _enhance_question(self, question: str) -> str:
+        """Clean and enhance research question."""
+        if not question or len(question.strip()) < 5:
+            return question
+
+        prompt = f"""Improve this research question to be clear and well-structured:
+
+Input: "{question}"
+
+Requirements:
+- Proper grammar and punctuation
+- Clear and specific
+- Academic tone
+- Start with question words (How, What, Why, etc.) if appropriate
+- Fix capitalization and spelling
+- Keep the core meaning
+
+Return ONLY the improved question, nothing else."""
+
+        try:
+            if self.provider == 'openai':
+                response = self.client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=150,
+                    temperature=0.3
+                )
+                result = response.choices[0].message.content.strip().strip('"').strip("'")
+                return result if result else question
+            elif self.provider == 'anthropic':
+                response = self.client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=150,
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                result = response.content[0].text.strip().strip('"').strip("'")
+                return result if result else question
+        except Exception as e:
+            print(f"   Question enhancement failed: {e}")
+            # Fallback to basic formatting
+            return self._basic_question_format(question)
+
+    def _enhance_methodology(self, methodology: str, field: str) -> str:
+        """Expand and enhance methodology description."""
+        if not methodology or len(methodology.strip()) < 10:
+            return methodology
+
+        prompt = f"""Expand this brief methodology into a clear, detailed description for a {field} research proposal:
+
+Input: "{methodology}"
+
+Requirements:
+- Expand to 3-4 sentences
+- Professional academic tone
+- Proper grammar and punctuation
+- Include specific methods/approaches
+- Make it concrete and actionable
+- Fix any errors
+
+Return ONLY the enhanced methodology, nothing else."""
+
+        try:
+            if self.provider == 'openai':
+                response = self.client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=250,
+                    temperature=0.4
+                )
+                result = response.choices[0].message.content.strip().strip('"').strip("'")
+                return result if result else methodology
+            elif self.provider == 'anthropic':
+                response = self.client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=250,
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                result = response.content[0].text.strip().strip('"').strip("'")
+                return result if result else methodology
+        except Exception as e:
+            print(f"   Methodology enhancement failed: {e}")
+            return methodology
+
+    def _enhance_outcomes(self, outcomes: str) -> str:
+        """Enhance expected outcomes description."""
+        if not outcomes or len(outcomes.strip()) < 5:
+            return outcomes
+
+        prompt = f"""Improve this expected outcomes description to be professional and compelling:
+
+Input: "{outcomes}"
+
+Requirements:
+- Proper grammar and punctuation
+- Professional academic tone
+- Clear and specific
+- Describe impact and significance
+- 2-3 sentences
+- Fix any errors
+
+Return ONLY the improved outcomes, nothing else."""
+
+        try:
+            if self.provider == 'openai':
+                response = self.client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=200,
+                    temperature=0.4
+                )
+                result = response.choices[0].message.content.strip().strip('"').strip("'")
+                return result if result else outcomes
+            elif self.provider == 'anthropic':
+                response = self.client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=200,
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                result = response.content[0].text.strip().strip('"').strip("'")
+                return result if result else outcomes
+        except Exception as e:
+            print(f"   Outcomes enhancement failed: {e}")
+            return outcomes
+
     def _init_client(self):
         """Initialize AI client."""
         try:
             if self.provider == 'openai':
-                import openai
-                self.client = openai.OpenAI(api_key=self.api_key)
+                from openai import OpenAI
+                self.client = OpenAI(api_key=self.api_key)
             elif self.provider == 'anthropic':
                 import anthropic
                 self.client = anthropic.Anthropic(api_key=self.api_key)
@@ -80,9 +360,9 @@ Requirements:
         try:
             if self.provider == 'openai':
                 response = self.client.chat.completions.create(
-                    model="gpt-4",
+                    model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],
-                    max_tokens=400,
+                    max_tokens=500,
                     temperature=0.7
                 )
                 return response.choices[0].message.content.strip()
@@ -149,9 +429,9 @@ Keep it academic but concise (300-400 words)."""
         try:
             if self.provider == 'openai':
                 response = self.client.chat.completions.create(
-                    model="gpt-4",
+                    model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],
-                    max_tokens=600,
+                    max_tokens=700,
                     temperature=0.7
                 )
                 return response.choices[0].message.content.strip()
@@ -213,9 +493,9 @@ Make it specific and academically rigorous (300-400 words)."""
         try:
             if self.provider == 'openai':
                 response = self.client.chat.completions.create(
-                    model="gpt-4",
+                    model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],
-                    max_tokens=600,
+                    max_tokens=700,
                     temperature=0.7
                 )
                 return response.choices[0].message.content.strip()
@@ -223,7 +503,7 @@ Make it specific and academically rigorous (300-400 words)."""
             elif self.provider == 'anthropic':
                 response = self.client.messages.create(
                     model="claude-3-5-sonnet-20241022",
-                    max_tokens=600,
+                    max_tokens=700,
                     messages=[{"role": "user", "content": prompt}]
                 )
                 return response.content[0].text.strip()

@@ -82,9 +82,6 @@ def process_proposal(inputs: dict, output_dir: Path) -> dict:
     """Main processing logic to generate research proposal."""
     print("🚀 Generating research proposal...")
 
-    # Get template for field of study
-    template = get_template(inputs['field_of_study'], inputs['proposal_type'])
-
     # Check if AI is available
     api_key = get_api_key(inputs['ai_provider'])
 
@@ -93,6 +90,29 @@ def process_proposal(inputs: dict, output_dir: Path) -> dict:
         provider=inputs['ai_provider'],
         api_key=api_key
     )
+
+    # LAYER 1: Enhance user input for better quality
+    enhanced_inputs = ai_generator.enhance_user_input(inputs)
+
+    # Show what was enhanced (for debugging)
+    if enhanced_inputs != inputs:
+        print("\n📝 Input Enhancement Summary:")
+        if enhanced_inputs['research_title'] != inputs['research_title']:
+            print(f"   Title: {inputs['research_title'][:50]}...")
+            print(f"   → {enhanced_inputs['research_title'][:50]}...")
+        if enhanced_inputs['research_question'] != inputs['research_question']:
+            print(f"   Question enhanced ✓")
+        if enhanced_inputs['methodology'] != inputs['methodology']:
+            print(f"   Methodology enhanced ✓")
+        if enhanced_inputs['expected_outcomes'] != inputs['expected_outcomes']:
+            print(f"   Outcomes enhanced ✓")
+        print()
+
+    # Use enhanced inputs for the rest of the process
+    inputs = enhanced_inputs
+
+    # Get template for field of study
+    template = get_template(inputs['field_of_study'], inputs['proposal_type'])
 
     # Generate AI-enhanced content
     print("📝 Generating executive summary...")
