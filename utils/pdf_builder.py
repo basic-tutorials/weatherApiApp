@@ -362,28 +362,39 @@ class PDFBuilder:
         ))
         story.append(Spacer(1, 0.1*inch))
 
-        # Create timeline table
+        # Create timeline table with Paragraph objects for proper wrapping
         table_data = [['Phase', 'Activities', 'Duration']]
+
+        # Custom style for table cells
+        cell_style = ParagraphStyle(
+            'CellStyle',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            leading=11
+        )
 
         for phase in timeline_data['phases']:
             table_data.append([
-                phase['phase'],
-                phase['activities'],
-                phase['duration']
+                Paragraph(phase['phase'], cell_style),
+                Paragraph(phase['activities'], cell_style),
+                Paragraph(phase['duration'], cell_style)
             ])
 
-        table = Table(table_data, colWidths=[1.5*inch, 3.5*inch, 1.5*inch])
+        table = Table(table_data, colWidths=[1.3*inch, 3.9*inch, 1.3*inch])
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2c3e50')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 11),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('TOPPADDING', (0, 1), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
         ]))
 
         story.append(table)
@@ -401,33 +412,43 @@ class PDFBuilder:
         story.append(Spacer(1, 0.1*inch))
 
         story.append(Paragraph(
-            f"Total Budget: ${budget_data['total']:,.2f}",
+            f"<b>Total Budget:</b> ${budget_data['total']:,.2f}",
             self.styles['CustomBody']
         ))
-        story.append(Spacer(1, 0.1*inch))
+        story.append(Spacer(1, 0.15*inch))
 
-        # Create budget table
+        # Create budget table with Paragraph objects
         table_data = [['Category', 'Amount', 'Percentage']]
+
+        cell_style = ParagraphStyle(
+            'BudgetCell',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            leading=11
+        )
 
         for item in budget_data['categories']:
             table_data.append([
-                item['name'],
-                f"${item['amount']:,.2f}",
-                f"{item['percentage']}%"
+                Paragraph(item['name'], cell_style),
+                Paragraph(f"${item['amount']:,.2f}", cell_style),
+                Paragraph(f"{item['percentage']}%", cell_style)
             ])
 
-        table = Table(table_data, colWidths=[3*inch, 2*inch, 1.5*inch])
+        table = Table(table_data, colWidths=[2.8*inch, 2.2*inch, 1.5*inch])
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2c3e50')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 11),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('TOPPADDING', (0, 1), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
         ]))
 
         story.append(table)
