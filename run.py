@@ -33,22 +33,18 @@ def get_inputs() -> dict:
         'methodology': os.environ.get('methodology', ''),
         'expected_outcomes': os.environ.get('expected_outcomes', ''),
 
-        # Text fields
-        'researcher_name': os.environ.get('researcher_name', 'Anonymous'),
-        'institution': os.environ.get('institution', ''),
+        # Optional fields
+        'researcher_name': os.environ.get('researcher_name', 'Anonymous Researcher'),
         'field_of_study': os.environ.get('field_of_study', 'Sciences'),
-
-        # Number fields
         'duration_months': int(os.environ.get('duration_months', '12')),
-        'budget': os.environ.get('budget', ''),
 
-        # Radio group
-        'proposal_type': os.environ.get('proposal_type', 'Research Project'),
-
-        # Optional
-        'references': os.environ.get('references', ''),
-        'ai_provider': os.environ.get('ai_provider', 'anthropic'),
-        'citation_format': os.environ.get('citation_format', 'APA'),
+        # Fixed defaults (not exposed to user)
+        'institution': '',
+        'budget': '',
+        'proposal_type': 'Research Project',
+        'references': '',
+        'ai_provider': 'openai',  # Fixed to OpenAI
+        'citation_format': 'APA',
     }
 
 
@@ -58,8 +54,7 @@ def validate_inputs(inputs: dict) -> None:
         'research_title',
         'research_question',
         'methodology',
-        'expected_outcomes',
-        'researcher_name'
+        'expected_outcomes'
     ]
 
     for field in required:

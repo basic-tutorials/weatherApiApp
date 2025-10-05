@@ -1,6 +1,6 @@
 # Abyss Widget Interface Configuration
 
-Copy these field configurations when setting up the widget on Abyss platform.
+**Simplified version - Only 7 essential fields**
 
 ---
 
@@ -24,7 +24,7 @@ Transform research ideas into professionally formatted proposals with AI-enhance
 
 ---
 
-## Input Fields Configuration
+## Input Fields Configuration (7 Fields Only)
 
 ### Field 1: Research Title
 ```yaml
@@ -70,30 +70,21 @@ Description: Describe the anticipated results and why they matter
 Rows: 3
 ```
 
-### Field 5: Researcher Name
+### Field 5: Researcher Name (Optional)
 ```yaml
 Field Name: researcher_name
-Label: Researcher Name
-Type: Text Field
-Required: Yes
-Placeholder: John Doe
-Description: Your full name
-```
-
-### Field 6: Institution
-```yaml
-Field Name: institution
-Label: Institution / University
+Label: Researcher Name (Optional)
 Type: Text Field
 Required: No
-Placeholder: University of Example
-Description: Your institution or university (optional)
+Placeholder: Dr. Jane Smith
+Description: Your name (optional, defaults to "Anonymous Researcher")
+Default: Anonymous Researcher
 ```
 
-### Field 7: Field of Study
+### Field 6: Field of Study (Optional)
 ```yaml
 Field Name: field_of_study
-Label: Field of Study
+Label: Field of Study (Optional)
 Type: Select
 Required: No
 Options:
@@ -104,132 +95,64 @@ Options:
   - value: "Medical", label: "Medical"
   - value: "Business", label: "Business"
 Default: "Sciences"
-Description: Select your field of study for customized formatting
+Description: Select your field for customized formatting (optional)
 ```
 
-### Field 8: Duration (Months)
+### Field 7: Duration (Optional)
 ```yaml
 Field Name: duration_months
-Label: Project Duration (Months)
+Label: Project Duration in Months (Optional)
 Type: Number
 Required: No
 Min Value: 1
 Max Value: 60
 Default Value: 12
 Step: 1
-Description: Proposed project duration in months (1-60)
-```
-
-### Field 9: Budget
-```yaml
-Field Name: budget
-Label: Estimated Budget (Optional)
-Type: Text Field
-Required: No
-Placeholder: 50000
-Description: Estimated budget in dollars (enter number only, e.g., 50000)
-```
-
-### Field 10: Proposal Type
-```yaml
-Field Name: proposal_type
-Label: Proposal Type
-Type: Radio Group
-Required: No
-Options:
-  - value: "Grant Application", label: "Grant Application"
-  - value: "Thesis Proposal", label: "Thesis Proposal"
-  - value: "Research Project", label: "Research Project"
-  - value: "Conference Abstract", label: "Conference Abstract"
-Default: "Research Project"
-Description: Type of research proposal you are creating
-```
-
-### Field 11: References
-```yaml
-Field Name: references
-Label: References / Bibliography (Optional)
-Type: Text Area
-Required: No
-Placeholder: Enter your references in your chosen citation format...
-Description: Optional: Add your references/bibliography (one per line)
-Rows: 4
-```
-
-### Field 12: AI Provider
-```yaml
-Field Name: ai_provider
-Label: AI Provider
-Type: Radio Group
-Required: No
-Options:
-  - value: "anthropic", label: "Anthropic Claude (Recommended)"
-  - value: "openai", label: "OpenAI GPT-4"
-Default: "anthropic"
-Description: Select AI provider for content generation (requires API key)
-```
-
-### Field 13: Citation Format
-```yaml
-Field Name: citation_format
-Label: Citation Format
-Type: Select
-Required: No
-Options:
-  - value: "APA", label: "APA (American Psychological Association)"
-  - value: "MLA", label: "MLA (Modern Language Association)"
-  - value: "Chicago", label: "Chicago"
-  - value: "IEEE", label: "IEEE"
-  - value: "Vancouver", label: "Vancouver"
-Default: "APA"
-Description: Preferred citation format for references
+Description: Project duration (1-60 months, default: 12)
 ```
 
 ---
 
 ## Environment Variables (API Keys)
 
-These should be set in the Abyss platform settings:
+**Required for AI enhancement:**
 
 ```yaml
-OPENAI_API_KEY: [Your OpenAI API Key - Optional]
-ANTHROPIC_API_KEY: [Your Anthropic API Key - Optional]
+OPENAI_API_KEY: [Your OpenAI API Key]
 ```
 
-**Note:** API keys are optional. Without them, the widget will use template-based generation (still produces professional output).
+**Note:** If no API key provided, widget uses template-based generation (still professional output).
+
+---
+
+## Removed Fields (Now Using Fixed Defaults)
+
+These are now handled automatically:
+- ❌ Institution → Empty (not shown)
+- ❌ Budget → Empty (no budget section)
+- ❌ Proposal Type → Fixed to "Research Project"
+- ❌ References → Empty (no references section)
+- ❌ AI Provider → Fixed to "openai"
+- ❌ Citation Format → Fixed to "APA"
 
 ---
 
 ## Example Test Input
-
-Use this for testing the widget:
 
 ```
 research_title: "Machine Learning Applications in Climate Change Prediction"
 
 research_question: "How can ensemble machine learning models improve long-term climate prediction accuracy compared to traditional climate models?"
 
-methodology: "Comparative analysis of neural networks, random forests, and gradient boosting models using 50 years of historical climate data from NOAA. Models will be trained, validated, and tested using cross-validation techniques."
+methodology: "Comparative analysis of neural networks, random forests, and gradient boosting models using 50 years of historical climate data from NOAA."
 
-expected_outcomes: "Development of a hybrid ensemble model with 15-20% improved accuracy over current methods. Results will contribute to better climate policy decisions and disaster preparedness strategies."
+expected_outcomes: "Development of a hybrid ensemble model with 15-20% improved accuracy over current methods."
 
 researcher_name: "Dr. Jane Smith"
-
-institution: "MIT Climate Research Lab"
 
 field_of_study: "Sciences"
 
 duration_months: 18
-
-budget: 125000
-
-proposal_type: "Grant Application"
-
-references: "Smith, J. (2023). Climate modeling approaches. Nature Climate Change, 13(2), 145-160.\nDoe, R. (2022). Machine learning in meteorology. Science, 375(6580), 421-425."
-
-ai_provider: "anthropic"
-
-citation_format: "APA"
 ```
 
 ---
@@ -244,25 +167,34 @@ citation_format: "APA"
 
 ## Deployment Checklist
 
-- [x] All 13 input fields configured
+- [x] Only 7 input fields (4 required, 3 optional)
 - [x] Field names match environment variables exactly
 - [x] Required fields marked correctly
-- [x] Default values set
-- [x] Descriptions are clear and helpful
-- [x] Test data prepared
-- [x] README.md complete
-- [x] requirements.txt ready
+- [x] Default values set for optional fields
+- [x] OpenAI API key set as environment variable
 - [ ] Test run successful
 - [ ] Example output saved
 - [ ] Thumbnail created (16:10 ratio)
 
 ---
 
-## Support Notes
+## Summary: 4 Required + 3 Optional = 7 Total Fields
 
-If users encounter issues:
-1. Check that all required fields are filled
-2. Verify duration is between 1-60 months
-3. Budget should be numbers only (no $ or commas)
-4. API keys are optional but recommended
-5. Check error.txt in output for specific errors
+**Required (4):**
+1. research_title
+2. research_question
+3. methodology
+4. expected_outcomes
+
+**Optional (3):**
+5. researcher_name (default: "Anonymous Researcher")
+6. field_of_study (default: "Sciences")
+7. duration_months (default: 12)
+
+**Fixed internally:**
+- AI Provider: OpenAI
+- Citation Format: APA
+- Proposal Type: Research Project
+- Institution, Budget, References: Not used
+
+Much simpler! ✨
